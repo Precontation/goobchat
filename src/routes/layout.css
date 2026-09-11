@@ -1,0 +1,27 @@
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/forms';
+
+@theme {
+	--color-primary: #ffffff;
+	--color-secondary: #a6a6a6;
+	--color-surface: #222121;
+	--color-border: #252525;
+	--color-theme: #417025;
+	--color-background: #191919;
+	--color-warn: #993f3f;
+
+	--radius-bubble: 0.75rem;
+
+	--padding-theme: 0.625rem;
+
+	--gap-theme: 0.625rem;
+	--gap-messages: 1rem;
+}
+
+@layer base {
+	body {
+		background-color: var(--color-background);
+		color: var(--color-primary);
+	}
+}
