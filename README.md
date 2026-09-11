@@ -1,3 +1,3 @@
 # goobchat
 
-The ultimate merger chatapp and [goobapp](https://github.com/GoobApp/goobapp)
+The ultimate merger between Chatapp and [GoobApp](https://github.com/GoobApp/goobapp)
