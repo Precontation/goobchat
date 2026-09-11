@@ -17,6 +17,7 @@
 
 <style>
 	div {
+		background-color: var(--color-background);
 		border-color: var(--color-border);
 	}
 

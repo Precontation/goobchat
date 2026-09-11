@@ -3,18 +3,28 @@
 	import type { Message } from '$lib/types/message';
 	import Content from './Content.svelte';
 
-	let { message, reversed = false }: { message: Message; reversed?: boolean } = $props();
+	let {
+		message,
+		prevMessage,
+		reversed = false
+	}: { message: Message; prevMessage: Message | null; reversed?: boolean } = $props();
 </script>
 
 <div class="w-full">
 	<div class="message" class:reversed>
-		<Avatar src={message.sender.avatarSrc} displayName={message.sender.displayName} />
-		<div class="username-and-message">
-			<!-- TODO: colored username -->
-			<span>{message.sender.displayName}</span>
+		{#if message.sender.userId === prevMessage?.sender.userId}
+			<div class="mx-7 w-full">
+				<Content {message} />
+			</div>
+		{:else}
+			<Avatar src={message.sender.avatarSrc} displayName={message.sender.displayName} />
+			<div class="username-and-message">
+				<!-- TODO: colored username -->
+				<span>{message.sender.displayName}</span>
 
-			<Content {message} />
-		</div>
+				<Content {message} />
+			</div>
+		{/if}
 	</div>
 </div>
 

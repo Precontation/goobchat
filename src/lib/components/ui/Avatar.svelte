@@ -21,6 +21,6 @@
 	{#if src}
 		<img {src} alt={displayName} />
 	{:else}
-		<div>{displayName?.[0]?.toUpperCase() ?? '?'}</div>
+		<span class="select-none">{displayName?.[0]?.toUpperCase() ?? '?'}</span>
 	{/if}
 </div>

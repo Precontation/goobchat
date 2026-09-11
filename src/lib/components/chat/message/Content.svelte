@@ -6,9 +6,9 @@
 </script>
 
 <div
-	class="flex flex-col gap-theme rounded-bubble p-theme {showReply
-		? 'bg-surface'
-		: 'bg-background'}"
+	class="flex flex-col gap-theme self-end rounded-bubble p-theme {showReply
+		? 'w-fit bg-surface'
+		: 'w-full bg-background'}"
 >
 	{#if message.replyToMessage && showReply}
 		<Content message={message.replyToMessage} showReply={false} />
