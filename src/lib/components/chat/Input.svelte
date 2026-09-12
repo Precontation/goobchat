@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { currentUser } from '$lib/state/currentUser.svelte';
-	import { debugMessages } from '$lib/state/debugMessages.svelte';
+	import { debugMessages } from '$lib/state/debug.svelte';
 	import { onMount } from 'svelte';
 
 	let textAreaRef = $state<HTMLTextAreaElement>();

@@ -8,7 +8,7 @@
 </script>
 
 <div class="summary" class:reversed>
-	<Avatar displayName={user.displayName} src={user.avatarSrc} />
+	<Avatar displayName={user.displayName} src={user.avatarSrc} randomizeInput={user.userId} />
 	<div class="user-name flex flex-col">
 		<span class="displayName">{user.displayName}</span>
 		<span class="userId text-secondary">{user.userId}</span>
@@ -29,6 +29,7 @@
 
 		background: linear-gradient(90deg, var(--color-theme) 0%, transparent 100%);
 		flex-direction: row;
+
 		padding-right: calc(var(--padding-theme) * 5);
 	}
 
@@ -36,6 +37,8 @@
 		background: linear-gradient(90deg, transparent 0%, var(--color-theme) 100%);
 		flex-direction: row-reverse;
 		text-align: end;
-		padding-right: calc(var(--padding-theme) * 5);
+
+		padding-right: var(--padding-theme);
+		padding-left: calc(var(--padding-theme) * 5);
 	}
 </style>

@@ -10,7 +10,10 @@
 
 	--color-border: #252525;
 	--color-theme: #417025;
+
 	--color-background: #191919;
+	--color-message-background: #191919;
+
 	--color-warn: #993f3f;
 
 	--radius-bubble: 0.75rem;

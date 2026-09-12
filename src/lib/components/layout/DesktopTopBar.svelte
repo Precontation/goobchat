@@ -6,16 +6,16 @@
 
 <Bar direction="horizontal">
 	<div class="container">
-		<UserSummary user={currentUser} reversed={false} />
+		<UserSummary user={currentUser} reversed={true} />
 	</div>
 </Bar>
 
 <style>
 	.container {
-		width: 100%;
+		margin-left: auto;
 		height: 100%;
 
 		display: flex;
-		flex-direction: row;
+		flex-direction: row-reverse;
 	}
 </style>

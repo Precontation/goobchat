@@ -1,7 +1,16 @@
 <!-- @component Displays an avatar for a user, room, or anything else that needs it. If no image provided, falls back to a name-derived background -->
 
 <script lang="ts">
-	let { displayName, src }: { displayName: string; src?: string } = $props();
+	let {
+		/** The display name of the image to use as an image alt or defaults if no image found */
+		displayName,
+
+		/** The image source */
+		src,
+
+		/** Usually some ID */
+		randomizeInput
+	}: { displayName: string; src?: string; randomizeInput: string } = $props();
 
 	// https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
 	const generateHash = (string: string) => {
@@ -16,7 +25,7 @@
 
 <div
 	class="flex aspect-square h-10 w-10 items-center justify-center rounded-full"
-	style="background-color: hsl({generateHash(displayName) % 360}, 70%, 30%)"
+	style="background-color: hsl({generateHash(randomizeInput) % 360}, 70%, 30%)"
 >
 	{#if src}
 		<img {src} alt={displayName} />

@@ -17,7 +17,11 @@
 				<Content {message} />
 			</div>
 		{:else}
-			<Avatar src={message.sender.avatarSrc} displayName={message.sender.displayName} />
+			<Avatar
+				src={message.sender.avatarSrc}
+				displayName={message.sender.displayName}
+				randomizeInput={message.sender.userId}
+			/>
 			<div class="username-and-message">
 				<!-- TODO: colored username -->
 				<span>{message.sender.displayName}</span>
@@ -41,7 +45,6 @@
 	}
 
 	.username-and-message {
-		z-index: -1;
 		margin-inline: -0.75rem;
 		display: flex;
 		flex-direction: column;

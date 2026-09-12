@@ -8,7 +8,7 @@
 <div
 	class="flex flex-col gap-theme self-end rounded-bubble p-theme {showReply
 		? 'w-fit bg-surface'
-		: 'w-full bg-background'}"
+		: 'w-full bg-message-background'}"
 >
 	{#if message.replyToMessage && showReply}
 		<Content message={message.replyToMessage} showReply={false} />

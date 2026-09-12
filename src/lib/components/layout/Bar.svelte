@@ -11,7 +11,11 @@
 	let { children, direction = 'horizontal' }: Props = $props();
 </script>
 
-<div class:horizontal={direction === 'horizontal'} class:vertical={direction === 'vertical'}>
+<div
+	class="flex w-full"
+	class:horizontal={direction === 'horizontal'}
+	class:vertical={direction === 'vertical'}
+>
 	{@render children()}
 </div>
 
