@@ -16,5 +16,7 @@
 	.app-shell {
 		flex: 1;
 		overflow: hidden;
+
+		overscroll-behavior: none;
 	}
 </style>
