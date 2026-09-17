@@ -9,6 +9,8 @@
 	</div>
 
 	<div class="flex flex-1">
-		<span class="w-full content-center text-center text-secondary">Select a room to view!</span>
+		<span class="w-full content-center text-center text-secondary select-none"
+			>Select a room to view!</span
+		>
 	</div>
 </div>

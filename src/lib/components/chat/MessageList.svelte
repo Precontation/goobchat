@@ -32,7 +32,6 @@
 	.message-list {
 		flex: 1;
 
-		border-radius: var(--radius-bubble);
 		background-color: var(--color-message-background);
 
 		display: flex;

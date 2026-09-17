@@ -12,7 +12,7 @@
 	--color-theme: #417025;
 
 	--color-background: #191919;
-	--color-message-background: #191919;
+	--color-message-background: var(--color-background);
 
 	--color-warn: #993f3f;
 
