@@ -30,6 +30,11 @@
 		color: var(--color-primary);
 	}
 
+	html,
+	body {
+		overscroll-behavior: none;
+	}
+
 	textarea:focus {
 		outline: none;
 		box-shadow: none;

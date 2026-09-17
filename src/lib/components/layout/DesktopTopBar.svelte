@@ -5,7 +5,8 @@
 	import Bar from './Bar.svelte';
 </script>
 
-<Bar direction="horizontal">
+<Bar direction="horizontal" class="relative">
+	<div data-tauri-drag-region class="absolute top-0 right-0 bottom-0 left-0"></div>
 	<button class="container w-fit" popovertarget="user-summary">
 		<UserSummary user={currentUser} reversed={true} />
 	</button>

@@ -17,11 +17,13 @@
 				<Content {message} />
 			</div>
 		{:else}
-			<Avatar
-				src={message.sender.avatarSrc}
-				displayName={message.sender.displayName}
-				randomizeInput={message.sender.userId}
-			/>
+			<div class="z-1">
+				<Avatar
+					src={message.sender.avatarSrc}
+					displayName={message.sender.displayName}
+					randomizeInput={message.sender.userId}
+				/>
+			</div>
 			<div class="username-and-message">
 				<!-- TODO: colored username -->
 				<span>{message.sender.displayName}</span>
@@ -41,7 +43,7 @@
 
 	.reversed {
 		flex-direction: row-reverse;
-		justify-self: end;
+		margin-left: auto;
 	}
 
 	.username-and-message {

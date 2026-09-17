@@ -6,15 +6,16 @@
 	type Props = {
 		children: Snippet;
 		direction?: 'horizontal' | 'vertical';
+		class?: string;
 	};
 
-	let { children, direction = 'horizontal' }: Props = $props();
+	let { children, direction = 'horizontal', class: className }: Props = $props();
 </script>
 
 <div
-	class="flex w-full"
 	class:horizontal={direction === 'horizontal'}
 	class:vertical={direction === 'vertical'}
+	class="flex w-full {className}"
 >
 	{@render children()}
 </div>
