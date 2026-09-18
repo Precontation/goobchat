@@ -6,6 +6,7 @@ export interface Session {
 	accessToken: string;
 	userId: string;
 	deviceId: string;
+	homeserver: string;
 }
 
 export const saveSession = async (session: Session): Promise<void> => {

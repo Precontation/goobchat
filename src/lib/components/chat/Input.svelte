@@ -5,7 +5,7 @@
 
 	let textAreaRef = $state<HTMLTextAreaElement>();
 
-	function onSubmit() {
+	const onSubmit = () => {
 		if (!textAreaRef) return;
 
 		debugMessages.push({
@@ -16,9 +16,9 @@
 				content: textAreaRef.value
 			}
 		});
-	}
+	};
 
-	function handleKeydown(event: KeyboardEvent) {
+	const handleKeydown = (event: KeyboardEvent) => {
 		if (!textAreaRef) return;
 
 		const MODIFIER_KEYS = [
@@ -70,7 +70,7 @@
 
 			event.preventDefault();
 		}
-	}
+	};
 
 	onMount(() => {
 		window.addEventListener('keydown', handleKeydown);
