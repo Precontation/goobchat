@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Room } from '$lib/types/room';
+	import type { UIRoom } from '$lib/types/room';
 	import RoomButton from '../ui/RoomButton.svelte';
 
-	let { rooms }: { rooms: Room[] } = $props();
+	let { rooms }: { rooms: UIRoom[] } = $props();
 </script>
 
 <div class="flex w-full flex-col gap-theme">

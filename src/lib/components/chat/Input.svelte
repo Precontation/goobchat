@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { currentUser } from '$lib/state/currentUser.svelte';
-	import { debugMessages } from '$lib/state/debug.svelte';
 	import { onMount } from 'svelte';
 
 	let textAreaRef = $state<HTMLTextAreaElement>();
@@ -8,14 +6,15 @@
 	const onSubmit = () => {
 		if (!textAreaRef) return;
 
-		debugMessages.push({
-			id: '$test msg',
-			sender: currentUser,
-			data: {
-				kind: 'text',
-				content: textAreaRef.value
-			}
-		});
+		alert('TODO');
+		// debugMessages.push({
+		// 	id: '$test msg',
+		// 	sender: currentUser,
+		// 	data: {
+		// 		kind: 'text',
+		// 		content: textAreaRef.value
+		// 	}
+		// });
 	};
 
 	const handleKeydown = (event: KeyboardEvent) => {

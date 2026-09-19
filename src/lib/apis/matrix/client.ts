@@ -1,7 +1,8 @@
 // this, is the main file thing yay and yes I WILL USE TYPESCRIPT AND NOT JAVASCRIPT OKAY?? OKAY.
 import { matrixState } from '$lib/state/matrixClient.svelte';
 import { createClient, type MatrixClient } from 'matrix-js-sdk';
-import { loadSession, saveSession, type Session } from './session';
+import { loadSession, saveSession, type Session } from '../session';
+import { setupSync } from './sync';
 
 export let client: MatrixClient | undefined;
 
@@ -14,25 +15,41 @@ const normalizeHomeserver = (rawHomeserver: string): string => {
 	return homeserver;
 };
 
+const setupAndStart = async (c: MatrixClient) => {
+	await c.initRustCrypto();
+
+	setupSync(c);
+
+	c.startClient();
+};
+
 export const load = async (): Promise<void> => {
 	matrixState.loading = true;
 	const session = await loadSession();
 
 	if (!session) {
-		matrixState.loggedIn = false; // It's already logged off by default, but doesn't hurt.
 		matrixState.loading = false;
+		matrixState.loggedIn = false; // It's already logged off by default, but doesn't hurt.
+		// Don't set loading to false; this is handled on a SyncState.PREPARED callback
 		return;
 	}
 
-	client = createClient({
-		accessToken: session.accessToken,
-		deviceId: session.deviceId,
-		userId: session.userId,
-		baseUrl: session.homeserver
-	});
+	try {
+		client = createClient({
+			accessToken: session.accessToken,
+			deviceId: session.deviceId,
+			userId: session.userId,
+			baseUrl: session.homeserver
+		});
 
-	matrixState.loggedIn = true;
-	matrixState.loading = false;
+		matrixState.loggedIn = true;
+		matrixState.loading = false;
+
+		await setupAndStart(client);
+	} catch {
+		matrixState.loggedIn = false;
+		matrixState.loading = false;
+	}
 };
 
 export const login = async (
@@ -66,6 +83,6 @@ export const login = async (
 	});
 
 	matrixState.loggedIn = true;
-};
 
-export const getClient = () => client;
+	await setupAndStart(client);
+};

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Message } from '$lib/types/message';
+	import type { TimelineMessage } from '$lib/types/event';
 	import Content from './Content.svelte';
 
-	let { message, showReply = true }: { message: Message; showReply?: boolean } = $props();
+	let { message, showReply = true }: { message: TimelineMessage; showReply?: boolean } = $props();
 </script>
 
 <div

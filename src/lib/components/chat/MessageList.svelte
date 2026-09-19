@@ -1,10 +1,10 @@
 <script lang="ts">
 	import MessageDisplay from '$lib/components/chat/message/Message.svelte';
-	import type { Message as MessageData } from '$lib/types/message';
+	import type { TimelineMessage } from '$lib/types/event';
 
 	import { fly } from 'svelte/transition';
 
-	let { messages }: { messages: MessageData[] } = $props();
+	let { messages }: { messages: TimelineMessage[] } = $props();
 
 	let listRef = $state<HTMLDivElement>();
 

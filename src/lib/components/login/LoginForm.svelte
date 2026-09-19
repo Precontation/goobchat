@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { login } from '$lib/apis/client';
+	import { login } from '$lib/apis/matrix/client';
 
 	const placeholderHomeserver = 'matrix.org';
 
@@ -23,7 +23,6 @@
 		}
 
 		await login(homeserver, username, password);
-		console.log('log in');
 	};
 </script>
 

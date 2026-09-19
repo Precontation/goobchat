@@ -1,13 +1,16 @@
 <script lang="ts">
-	import { load } from '$lib/apis/client';
+	import { load } from '$lib/apis/matrix/client';
 	import favicon from '$lib/assets/favicon.svg';
 	import LoginForm from '$lib/components/login/LoginForm.svelte';
 	import { matrixState } from '$lib/state/matrixClient.svelte';
+	import { onMount } from 'svelte';
 	import './layout.css';
 
 	let { children } = $props();
 
-	load();
+	onMount(() => {
+		load();
+	});
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>

@@ -28,17 +28,23 @@ export interface ImageMessage extends AttachmentData {
 }
 
 /** A message of any message type. */
-export interface Message {
-	/** The ID of the message event. For example, `$AJ2vFQnIereIZFkzO14Or8IKTf4jsM5XoaUDgc7zMtM`. */
-	id: string;
-
+export interface TimelineMessage extends TimelineEvent {
 	/** The message being replied to, if any.
 	 * @todo This works fine with mock data, but when implementing the matrix protocol, this will need to be changed to `replyToId?: string` and loaded dynamically. */
-	replyToMessage?: Message;
+	replyToMessage?: TimelineMessage;
 
 	/** The User object of the sender. */
 	sender: User;
 
 	/** Content and metadata specific to the message kind. */
 	data: TextMessage | FileMessage | ImageMessage;
+}
+
+/** The event itself */
+export interface TimelineEvent {
+	/** The ID of the event. For example, `$AJ2vFQnIereIZFkzO14Or8IKTf4jsM5XoaUDgc7zMtM`. */
+	id: string;
+
+	/** The timestamp of the event! Pretty self-explanatory haha*/
+	timestamp: number;
 }

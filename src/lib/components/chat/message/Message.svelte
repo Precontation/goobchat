@@ -1,13 +1,17 @@
 <script lang="ts">
 	import Avatar from '$lib/components/ui/Avatar.svelte';
-	import type { Message } from '$lib/types/message';
+	import type { TimelineMessage } from '$lib/types/event';
 	import Content from './Content.svelte';
 
 	let {
 		message,
 		prevMessage,
 		reversed = false
-	}: { message: Message; prevMessage: Message | null; reversed?: boolean } = $props();
+	}: {
+		message: TimelineMessage;
+		prevMessage: TimelineMessage | null;
+		reversed?: boolean;
+	} = $props();
 </script>
 
 <div class="w-full">

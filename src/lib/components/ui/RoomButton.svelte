@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import type { Room } from '$lib/types/room';
+	import type { UIRoom } from '$lib/types/room';
 	import Avatar from './Avatar.svelte';
 
-	let { room, isLast = false }: { room: Room; isLast?: boolean } = $props();
+	let { room, isLast = false }: { room: UIRoom; isLast?: boolean } = $props();
 </script>
 
 <a href={resolve('/(app)/[roomId]', { roomId: room.roomId })}>
-	<Avatar src={room.avatarSrc} displayName={room.displayName} randomizeInput={room.roomId} />
+	<Avatar src={room.avatarSrc ?? undefined} displayName={room.name} randomizeInput={room.roomId} />
 	<div class="flex min-w-0 flex-1 flex-col items-start">
-		<span class="w-full text-start text-nowrap">{room.displayName}</span>
+		<span class="w-full text-start text-nowrap">{room.name}</span>
 		<span class="w-full truncate text-start text-nowrap text-ellipsis text-secondary"
 			>{room.caption}</span
 		>
