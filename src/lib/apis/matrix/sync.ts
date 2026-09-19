@@ -6,8 +6,8 @@ export const setupSync = (client: MatrixClient): void => {
 	client.on(ClientEvent.Sync, (state) => {
 		switch (state) {
 			case SyncState.Prepared:
-				loadRooms();
 				matrixState.loading = false;
+				loadRooms();
 				break;
 
 			case SyncState.Error:

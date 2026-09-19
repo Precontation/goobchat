@@ -9,8 +9,7 @@ const getRoomCaption = (room: Room): string => {
 
 	const eventContent = event.getContent();
 
-	console.log(eventContent);
-	return eventContent.displayname + ': ' + eventContent.body;
+	return room.getMember(event.getSender() ?? '')?.name + ': ' + eventContent.body;
 };
 
 const ROOM_AVATAR_SIZE = 64;

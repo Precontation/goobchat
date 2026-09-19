@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { sendTextMessage } from '$lib/apis/matrix/messages';
 	import { onMount } from 'svelte';
 
 	let textAreaRef = $state<HTMLTextAreaElement>();
@@ -6,15 +7,7 @@
 	const onSubmit = () => {
 		if (!textAreaRef) return;
 
-		alert('TODO');
-		// debugMessages.push({
-		// 	id: '$test msg',
-		// 	sender: currentUser,
-		// 	data: {
-		// 		kind: 'text',
-		// 		content: textAreaRef.value
-		// 	}
-		// });
+		sendTextMessage(textAreaRef.value);
 	};
 
 	const handleKeydown = (event: KeyboardEvent) => {

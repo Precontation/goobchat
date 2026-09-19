@@ -1,7 +1,8 @@
 // this, is the main file thing yay and yes I WILL USE TYPESCRIPT AND NOT JAVASCRIPT OKAY?? OKAY.
 import { matrixState } from '$lib/state/matrixClient.svelte';
-import { createClient, type MatrixClient } from 'matrix-js-sdk';
+import { createClient, IndexedDBStore, type MatrixClient } from 'matrix-js-sdk';
 import { loadSession, saveSession, type Session } from '../session';
+import { setupMessageListener } from './messages';
 import { setupSync } from './sync';
 
 export let client: MatrixClient | undefined;
@@ -15,12 +16,39 @@ const normalizeHomeserver = (rawHomeserver: string): string => {
 	return homeserver;
 };
 
-const setupAndStart = async (c: MatrixClient) => {
-	await c.initRustCrypto();
+const setupAndStart = async (session: Session) => {
+	// Set up and start up a IndexedDB store for caching
+	// a persistent Matrix room, sync, and timeline state
+	const store = new IndexedDBStore({
+		indexedDB: window.indexedDB,
+		localStorage: window.localStorage
+	});
 
-	setupSync(c);
+	try {
+		client = createClient({
+			accessToken: session.accessToken,
+			deviceId: session.deviceId,
+			userId: session.userId,
+			baseUrl: session.homeserver,
+			store: store
+		});
+	} catch {
+		matrixState.loggedIn = false;
+		matrixState.loading = false;
 
-	c.startClient();
+		return;
+	}
+
+	await store.startup();
+
+	await client.initRustCrypto();
+
+	setupSync(client);
+	setupMessageListener(client);
+
+	await client.startClient();
+
+	matrixState.loggedIn = true;
 };
 
 export const load = async (): Promise<void> => {
@@ -28,28 +56,12 @@ export const load = async (): Promise<void> => {
 	const session = await loadSession();
 
 	if (!session) {
-		matrixState.loading = false;
 		matrixState.loggedIn = false; // It's already logged off by default, but doesn't hurt.
-		// Don't set loading to false; this is handled on a SyncState.PREPARED callback
+		matrixState.loading = false;
 		return;
 	}
 
-	try {
-		client = createClient({
-			accessToken: session.accessToken,
-			deviceId: session.deviceId,
-			userId: session.userId,
-			baseUrl: session.homeserver
-		});
-
-		matrixState.loggedIn = true;
-		matrixState.loading = false;
-
-		await setupAndStart(client);
-	} catch {
-		matrixState.loggedIn = false;
-		matrixState.loading = false;
-	}
+	await setupAndStart(session);
 };
 
 export const login = async (
@@ -75,14 +87,5 @@ export const login = async (
 	};
 
 	await saveSession(session);
-	client = createClient({
-		baseUrl: homeserver,
-		accessToken: session.accessToken,
-		userId: session.userId,
-		deviceId: session.deviceId
-	});
-
-	matrixState.loggedIn = true;
-
-	await setupAndStart(client);
+	await setupAndStart(session);
 };
