@@ -1,6 +1,8 @@
 <!-- @component Displays an avatar for a user, room, or anything else that needs it. If no image provided, falls back to a name-derived background -->
 
 <script lang="ts">
+	import { loadThumbnail } from '$lib/apis/matrix/media';
+
 	let {
 		/** The display name of the image to use as an image alt or defaults if no image found */
 		displayName,
@@ -11,6 +13,22 @@
 		/** Usually some ID */
 		randomizeInput
 	}: { displayName: string; src?: string; randomizeInput: string } = $props();
+
+	let imageSrc = $state<string>();
+
+	$effect(() => {
+		imageSrc = undefined;
+		if (!src) return;
+
+		let cancelled = false;
+		loadThumbnail(src).then((loaded) => {
+			if (!cancelled) imageSrc = loaded;
+		});
+
+		return () => {
+			cancelled = true;
+		};
+	});
 
 	// https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
 	const generateHash = (string: string) => {
@@ -27,8 +45,8 @@
 	class="flex aspect-square h-10 w-10 items-center justify-center rounded-full"
 	style="background-color: hsl({generateHash(randomizeInput) % 360}, 70%, 30%)"
 >
-	{#if src}
-		<img {src} alt={displayName} />
+	{#if imageSrc}
+		<img src={imageSrc} alt={displayName} />
 	{:else}
 		<span class="select-none">{displayName?.[0]?.toUpperCase() ?? '?'}</span>
 	{/if}

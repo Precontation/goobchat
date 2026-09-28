@@ -1,10 +1,12 @@
 // this, is the main file thing yay and yes I WILL USE TYPESCRIPT AND NOT JAVASCRIPT OKAY?? OKAY.
 import { matrixState } from '$lib/state/matrixClient.svelte';
 import { createClient, IndexedDBStore, type MatrixClient } from 'matrix-js-sdk';
-import { loadSession, saveSession, type Session } from '../session';
+import { clearSession, loadSession, saveSession, type Session } from '../session';
 import { setupMessageListener } from './messages';
 import { setupRoomListeners } from './rooms';
 import { setupSync } from './sync';
+import { loadCurrentUser, resetCurrentUser } from './user';
+import { clearThumbnailCache } from './media';
 
 export let client: MatrixClient | undefined;
 
@@ -50,7 +52,7 @@ const setupAndStart = async (session: Session) => {
 
 
 	await client.startClient();
-
+	await loadCurrentUser(client);
 	matrixState.loggedIn = true;
 };
 
@@ -75,6 +77,7 @@ export const login = async (
 	const homeserver = normalizeHomeserver(rawHomeserver);
 
 	const tempClient = createClient({ baseUrl: homeserver });
+	await tempClient.clearStores();
 	const response = await tempClient.loginRequest({
 		type: 'm.login.password',
 		identifier: { type: 'm.id.user', user: username },
@@ -92,3 +95,22 @@ export const login = async (
 	await saveSession(session);
 	await setupAndStart(session);
 };
+
+export const logout = async (): Promise<void> => {
+
+if (!client) return;
+try {
+	await client.logout(true)
+} catch (error) {
+console.warn("server logout failed :( clearing local data anyways", error)
+
+}
+await client.clearStores();
+await clearSession();
+client = undefined;
+matrixState.loggedIn = false;
+matrixState.rooms = [];
+matrixState.events = [];
+resetCurrentUser();
+clearThumbnailCache();
+}

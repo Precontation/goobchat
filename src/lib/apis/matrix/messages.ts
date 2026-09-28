@@ -5,7 +5,6 @@ import { client } from './client';
 
 let room: Room | null;
 
-const USER_AVATAR_SIZE = 64;
 
 const handleRoomMessage = (
 	event: MatrixEvent,
@@ -25,16 +24,8 @@ const handleRoomMessage = (
 		sender: {
 			displayName: member?.name ?? sender,
 			userId: sender,
-			avatarSrc:
-				member?.getAvatarUrl(
-					client.getHomeserverUrl(),
-					USER_AVATAR_SIZE,
-					USER_AVATAR_SIZE,
-					'crop',
-					false,
-					false,
-					false
-				) ?? undefined
+						avatarSrc: member?.getMxcAvatarUrl()
+
 		},
 
 		data: {

@@ -1,5 +1,6 @@
 <script>
 	import { currentUser } from '$lib/state/currentUser.svelte';
+	import { logout } from '$lib/apis/matrix/client';
 	import ContextMenu from '../ui/ContextMenu.svelte';
 	import UserSummary from '../ui/UserSummary.svelte';
 	import Bar from './Bar.svelte';
@@ -17,7 +18,7 @@
 			},
 			{
 				name: 'Log Out',
-				action: () => {}
+				action: logout
 			}
 		]}
 	></ContextMenu>

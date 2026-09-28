@@ -16,7 +16,7 @@ return name + ": " + body;
 
 }
 
-const ROOM_AVATAR_SIZE = 64;
+
 export const loadRooms = (): void => {
 	if (!client) return;
 	const cachedClient = client;
@@ -26,14 +26,7 @@ export const loadRooms = (): void => {
 			name: room.name,
 			roomId: room.roomId,
 			caption: getRoomCaption(room),
-			avatarSrc: room.getAvatarUrl(
-				cachedClient.getHomeserverUrl(),
-				ROOM_AVATAR_SIZE,
-				ROOM_AVATAR_SIZE,
-				'crop',
-				false,
-				false
-			) // TODO: make last false true and make all avatars have authentication
+			avatarSrc: room.getMxcAvatarUrl()
 		};
 	});
 };
