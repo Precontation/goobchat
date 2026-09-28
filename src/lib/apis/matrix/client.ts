@@ -3,6 +3,7 @@ import { matrixState } from '$lib/state/matrixClient.svelte';
 import { createClient, IndexedDBStore, type MatrixClient } from 'matrix-js-sdk';
 import { loadSession, saveSession, type Session } from '../session';
 import { setupMessageListener } from './messages';
+import { setupRoomListeners } from './rooms';
 import { setupSync } from './sync';
 
 export let client: MatrixClient | undefined;
@@ -45,6 +46,8 @@ const setupAndStart = async (session: Session) => {
 
 	setupSync(client);
 	setupMessageListener(client);
+	setupRoomListeners(client);
+
 
 	await client.startClient();
 
