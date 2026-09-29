@@ -5,7 +5,6 @@ import { client } from './client';
 
 let room: Room | null;
 
-
 const handleRoomMessage = (
 	event: MatrixEvent,
 	eventRoom: Room,
@@ -24,8 +23,7 @@ const handleRoomMessage = (
 		sender: {
 			displayName: member?.name ?? sender,
 			userId: sender,
-						avatarSrc: member?.getMxcAvatarUrl()
-
+			avatarSrc: member?.getMxcAvatarUrl()
 		},
 
 		data: {

@@ -42,7 +42,7 @@
 </script>
 
 <div
-	class="flex aspect-square h-10 w-10 items-center justify-center rounded-full"
+	class="flex aspect-square h-10 w-10 items-center justify-center overflow-clip rounded-full"
 	style="background-color: hsl({generateHash(randomizeInput) % 360}, 70%, 30%)"
 >
 	{#if imageSrc}

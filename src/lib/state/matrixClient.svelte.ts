@@ -4,6 +4,7 @@ import type { UIRoom } from '$lib/types/room';
 export type MatrixState = {
 	loggedIn: boolean;
 	loading: boolean;
+	loadingSession: boolean;
 	rooms: UIRoom[];
 	events: TimelineEvent[];
 };
@@ -11,6 +12,7 @@ export type MatrixState = {
 const initState: MatrixState = {
 	loggedIn: false,
 	loading: true,
+	loadingSession: true,
 	rooms: [],
 	events: []
 };

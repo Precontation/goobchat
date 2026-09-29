@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { login } from '$lib/apis/matrix/client';
+	import LoadingCircle from '../ui/LoadingCircle.svelte';
 
 	const placeholderHomeserver = 'matrix.org';
+
+	let loading = $state(false);
 
 	const handleSubmit = async (event: SubmitEvent) => {
 		event.preventDefault();
@@ -22,24 +25,15 @@
 			console.error('No username and/or password provided!');
 		}
 
+		loading = true;
 		await login(homeserver, username, password);
+		loading = false;
 	};
 </script>
 
 <div class="login">
 	<h1>Log in</h1>
 	<form class="flex w-full flex-col gap-theme" onsubmit={handleSubmit}>
-		<div class="flex flex-col">
-			<label for="homeserver">Homeserver</label>
-			<input
-				type="text"
-				name="homeserver"
-				id="homeserver"
-				autocomplete="off"
-				placeholder={placeholderHomeserver}
-			/>
-		</div>
-
 		<div class="flex flex-col">
 			<label for="username">Username</label>
 			<input type="text" autocomplete="username" id="username" name="username" />
@@ -50,9 +44,26 @@
 			<input type="password" name="password" id="password" autocomplete="current-password" />
 		</div>
 
-		<button type="submit" class="bg-background hover:bg-surface-hover active:bg-surface-active"
-			>Submit</button
+		<button
+			type="submit"
+			class="flex justify-center bg-background py-2 hover:bg-surface-hover active:bg-surface-active"
+			disabled={loading}
+			>{#if loading}<LoadingCircle />{:else}Submit{/if}</button
 		>
+
+		<div class="h-px w-full bg-border"></div>
+		<div class="h-px w-full bg-border"></div>
+
+		<div class="flex flex-col">
+			<label for="homeserver">Homeserver</label>
+			<input
+				type="text"
+				name="homeserver"
+				id="homeserver"
+				autocomplete="off"
+				placeholder={placeholderHomeserver}
+			/>
+		</div>
 	</form>
 </div>
 

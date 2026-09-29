@@ -2,11 +2,11 @@
 import { matrixState } from '$lib/state/matrixClient.svelte';
 import { createClient, IndexedDBStore, type MatrixClient } from 'matrix-js-sdk';
 import { clearSession, loadSession, saveSession, type Session } from '../session';
+import { clearThumbnailCache } from './media';
 import { setupMessageListener } from './messages';
 import { setupRoomListeners } from './rooms';
 import { setupSync } from './sync';
 import { loadCurrentUser, resetCurrentUser } from './user';
-import { clearThumbnailCache } from './media';
 
 export let client: MatrixClient | undefined;
 
@@ -50,18 +50,21 @@ const setupAndStart = async (session: Session) => {
 	setupMessageListener(client);
 	setupRoomListeners(client);
 
-
 	await client.startClient();
 	await loadCurrentUser(client);
+
 	matrixState.loggedIn = true;
+	matrixState.loading = false;
 };
 
 export const load = async (): Promise<void> => {
 	matrixState.loading = true;
+	matrixState.loadingSession = true;
 	const session = await loadSession();
 
 	if (!session) {
 		matrixState.loggedIn = false; // It's already logged off by default, but doesn't hurt.
+		matrixState.loadingSession = false;
 		matrixState.loading = false;
 		return;
 	}
@@ -97,20 +100,18 @@ export const login = async (
 };
 
 export const logout = async (): Promise<void> => {
-
-if (!client) return;
-try {
-	await client.logout(true)
-} catch (error) {
-console.warn("server logout failed :( clearing local data anyways", error)
-
-}
-await client.clearStores();
-await clearSession();
-client = undefined;
-matrixState.loggedIn = false;
-matrixState.rooms = [];
-matrixState.events = [];
-resetCurrentUser();
-clearThumbnailCache();
-}
+	if (!client) return;
+	try {
+		await client.logout(true);
+	} catch (error) {
+		console.warn('server logout failed :( clearing local data anyways', error);
+	}
+	await client.clearStores();
+	await clearSession();
+	client = undefined;
+	matrixState.loggedIn = false;
+	matrixState.rooms = [];
+	matrixState.events = [];
+	resetCurrentUser();
+	clearThumbnailCache();
+};

@@ -28,6 +28,8 @@
 	html {
 		background-color: var(--color-background);
 		color: var(--color-primary);
+
+		height: 100%;
 	}
 
 	html,
