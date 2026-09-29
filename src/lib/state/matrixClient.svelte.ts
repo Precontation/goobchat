@@ -5,6 +5,7 @@ export type MatrixState = {
 	loggedIn: boolean;
 	loading: boolean;
 	loadingSession: boolean;
+	currentRoom?: UIRoom;
 	rooms: UIRoom[];
 	events: TimelineEvent[];
 };
@@ -13,6 +14,7 @@ const initState: MatrixState = {
 	loggedIn: false,
 	loading: true,
 	loadingSession: true,
+	currentRoom: undefined,
 	rooms: [],
 	events: []
 };

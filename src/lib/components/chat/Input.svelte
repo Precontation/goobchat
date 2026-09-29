@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { sendTextMessage } from '$lib/apis/matrix/messages';
+	import { matrixState } from '$lib/state/matrixClient.svelte';
 	import { onMount } from 'svelte';
 
 	let textAreaRef = $state<HTMLTextAreaElement>();
@@ -74,12 +75,14 @@
 </script>
 
 <form class="flex h-fit w-full gap-theme rounded-bubble bg-surface">
-	<!-- TODO: custom icon -->
+	<!-- TODO: custom icon would be much nicer than this ugly css -->
 	<div class="h-15 w-15 p-theme">
 		<button
 			class="h-full w-full cursor-pointer rounded-bubble hover:bg-surface-hover active:bg-surface-active"
 		>
-			<div class="flex h-full w-full items-center justify-center text-3xl leading-none select-none">
+			<div
+				class="flex h-full w-full -translate-y-0.75 items-center justify-center text-3xl leading-none select-none"
+			>
 				+
 			</div>
 		</button>
@@ -90,5 +93,7 @@
 		bind:this={textAreaRef}
 		name="content"
 		class="field-sizing-content max-h-50 min-h-15 w-full resize-none content-center border-0 bg-transparent"
-		placeholder="Send message"></textarea>
+		placeholder={matrixState.currentRoom
+			? `Message ${matrixState.currentRoom.name}`
+			: 'Send message'}></textarea>
 </form>

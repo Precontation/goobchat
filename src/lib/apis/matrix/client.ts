@@ -3,7 +3,7 @@ import { matrixState } from '$lib/state/matrixClient.svelte';
 import { createClient, IndexedDBStore, type MatrixClient } from 'matrix-js-sdk';
 import { clearSession, loadSession, saveSession, type Session } from '../session';
 import { clearThumbnailCache } from './media';
-import { setupMessageListener } from './messages';
+import { cleanupMessageListener, setupMessageListener } from './messages';
 import { setupRoomListeners } from './rooms';
 import { setupSync } from './sync';
 import { loadCurrentUser, resetCurrentUser } from './user';
@@ -62,10 +62,11 @@ export const load = async (): Promise<void> => {
 	matrixState.loadingSession = true;
 	const session = await loadSession();
 
+	matrixState.loadingSession = false; // Session is loaded by this point no matter what
+
 	if (!session) {
 		matrixState.loggedIn = false; // It's already logged off by default, but doesn't hurt.
-		matrixState.loadingSession = false;
-		matrixState.loading = false;
+		matrixState.loading = false; // Loading = false only in this case because otherwise it should still load the account
 		return;
 	}
 
@@ -101,6 +102,7 @@ export const login = async (
 
 export const logout = async (): Promise<void> => {
 	if (!client) return;
+	cleanupMessageListener(client);
 	try {
 		await client.logout(true);
 	} catch (error) {

@@ -1,3 +1,4 @@
+import type { EventStatus } from 'matrix-js-sdk';
 import type { User } from './user';
 
 export type MessageKind = 'text' | 'image' | 'file';
@@ -38,6 +39,9 @@ export interface TimelineMessage extends TimelineEvent {
 
 	/** Content and metadata specific to the message kind. */
 	data: TextMessage | FileMessage | ImageMessage;
+
+	/** The status of the current message */
+	status: EventStatus | null;
 }
 
 /** The event itself */

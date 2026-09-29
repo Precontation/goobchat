@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { TimelineMessage } from '$lib/types/event';
+	import { EventStatus } from 'matrix-js-sdk';
 	import Content from './Content.svelte';
 
 	let { message, showReply = true }: { message: TimelineMessage; showReply?: boolean } = $props();
@@ -8,7 +9,10 @@
 <div
 	class="flex flex-col gap-theme self-end rounded-bubble p-theme {showReply
 		? 'w-fit bg-surface'
-		: 'w-full bg-message-background'}"
+		: 'w-full bg-message-background'} {message.status === EventStatus.SENDING ||
+	message.status === EventStatus.QUEUED
+		? 'text-message-text-sending'
+		: ''}"
 >
 	{#if message.replyToMessage && showReply}
 		<Content message={message.replyToMessage} showReply={false} />

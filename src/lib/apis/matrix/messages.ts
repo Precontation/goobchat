@@ -29,7 +29,9 @@ const handleRoomMessage = (
 		data: {
 			kind: 'text',
 			content: event.getContent().body
-		}
+		},
+
+		status: event.status
 	};
 
 	return message;
@@ -57,22 +59,62 @@ const toTimelineEvent = (event: MatrixEvent, eventRoom: Room): TimelineEvent | n
 	return timelineEvent;
 };
 
-const onTimelineEvent = async (event: MatrixEvent) => {
-	if (!room) return;
-	if (room?.roomId !== event.getRoomId()) return;
+const onTimelineEvent = async (event: MatrixEvent, eventRoom: Room | undefined) => {
+	const savedRoom = eventRoom ?? room;
+	if (!savedRoom) return;
+
+	if (savedRoom.roomId !== event.getRoomId()) return;
 
 	await client?.decryptEventIfNeeded(event);
 
-	const timelineEvent = await toTimelineEvent(event, room);
-	if (timelineEvent) matrixState.events.push(timelineEvent);
+	const timelineEvent = toTimelineEvent(event, savedRoom);
+
+	if (!timelineEvent) return;
+
+	const eventInTimeline = matrixState.events.some(
+		(stateEvent) => stateEvent.id === timelineEvent.id
+	);
+
+	if (!eventInTimeline) {
+		// If the event doesn't exist, then it's a new message; add it to the timeline
+		matrixState.events.push(timelineEvent);
+	}
+};
+
+const onLocalEchoUpdated = async (
+	event: MatrixEvent,
+	eventRoom: Room | null,
+	oldEventId?: string
+) => {
+	const savedRoom = eventRoom ?? room;
+	if (!savedRoom) return;
+
+	if (savedRoom.roomId !== event.getRoomId()) return;
+
+	await client?.decryptEventIfNeeded(event);
+
+	const timelineEvent = toTimelineEvent(event, savedRoom);
+	if (!timelineEvent) return;
+
+	const eventIndex = matrixState.events.findIndex(
+		(stateEvent) => stateEvent.id === (oldEventId ?? timelineEvent.id)
+	);
+	if (eventIndex === -1) return;
+
+	matrixState.events[eventIndex] = timelineEvent;
+};
+
+export const setupMessageListener = (client: MatrixClient) => {
+	client.on(RoomEvent.Timeline, onTimelineEvent);
+	client.on(RoomEvent.LocalEchoUpdated, onLocalEchoUpdated);
+};
+
+export const cleanupMessageListener = (client: MatrixClient) => {
+	client.off(RoomEvent.Timeline, onTimelineEvent);
+	client.off(RoomEvent.LocalEchoUpdated, onLocalEchoUpdated);
 };
 
 export const setupMessages = async (roomId: string) => {
-	if (room) {
-		// Remove old listener if it exists
-		room.off(RoomEvent.Timeline, onTimelineEvent);
-	}
-
 	if (!client) return;
 	room = client.getRoom(roomId);
 	if (!room) return;
@@ -89,10 +131,6 @@ export const setupMessages = async (roomId: string) => {
 	);
 
 	matrixState.events = events.filter((event): event is TimelineEvent => event !== null);
-};
-
-export const setupMessageListener = (client: MatrixClient) => {
-	client.on(RoomEvent.Timeline, onTimelineEvent);
 };
 
 export const sendTextMessage = (content: string) => {

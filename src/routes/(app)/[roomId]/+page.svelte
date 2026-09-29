@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { client } from '$lib/apis/matrix/client';
 	import { setupMessages } from '$lib/apis/matrix/messages';
+	import { getRoomCaption } from '$lib/apis/matrix/rooms';
 	import Input from '$lib/components/chat/Input.svelte';
 	import MessageList from '$lib/components/chat/MessageList.svelte';
 	import { matrixState } from '$lib/state/matrixClient.svelte';
@@ -12,7 +13,18 @@
 	$effect(() => {
 		if (page.params.roomId && matrixState.loggedIn && !matrixState.loading) {
 			setupMessages(page.params.roomId);
-			name = client?.getRoom(page.params.roomId)?.name;
+			let room = client?.getRoom(page.params.roomId);
+			if (!room) {
+				matrixState.currentRoom = undefined;
+				return;
+			}
+
+			matrixState.currentRoom = {
+				avatarSrc: room.getMxcAvatarUrl(),
+				caption: getRoomCaption(room),
+				name: room.name,
+				roomId: room.roomId
+			};
 		}
 	});
 </script>
