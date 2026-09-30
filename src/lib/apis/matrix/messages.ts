@@ -1,8 +1,19 @@
 import { matrixState } from '$lib/state/matrixClient.svelte';
 import type { TimelineEvent, TimelineMessage } from '$lib/types/event';
-import { EventType, MatrixClient, MatrixEvent, MsgType, Room, RoomEvent } from 'matrix-js-sdk';
+import {
+	EventType,
+	MatrixClient,
+	MatrixEvent,
+	MatrixEventEvent,
+	MsgType,
+	Room,
+	RoomEvent
+} from 'matrix-js-sdk';
 import { client } from './client';
 import { getRoomCaption } from './rooms';
+
+const isStillActive = (roomId: string, activeClient: MatrixClient): boolean =>
+	matrixState.currentRoom?.roomId === roomId && client === activeClient;
 
 const handleRoomMessage = (
 	event: MatrixEvent,
@@ -60,56 +71,117 @@ const toTimelineEvent = (event: MatrixEvent, eventRoom: Room): TimelineEvent | n
 
 const onTimelineEvent = async (event: MatrixEvent, room: Room | undefined) => {
 	if (!room) return;
-
 	if (matrixState.currentRoom?.roomId !== event.getRoomId()) return;
 
-	await client?.decryptEventIfNeeded(event);
+	const activeClient = client; // Make a constant so if the client changes during the await it doesn't break
+	if (!activeClient) return;
 
-	const timelineEvent = toTimelineEvent(event, room);
+	await activeClient.decryptEventIfNeeded(event);
 
-	if (!timelineEvent) return;
+	if (!isStillActive(room.roomId, activeClient)) return;
 
-	const eventInTimeline = matrixState.events.some(
-		(stateEvent) => stateEvent.id === timelineEvent.id
-	);
-
-	if (!eventInTimeline) {
-		// If the event doesn't exist, then it's a new message; add it to the timeline
-		matrixState.events.push(timelineEvent);
-	}
+	mergeRoomMessages(room);
 };
 
 const onLocalEchoUpdated = async (event: MatrixEvent, room: Room | null, oldEventId?: string) => {
 	if (!room) return;
 
 	if (room.roomId !== event.getRoomId()) return;
+	if (matrixState.currentRoom?.roomId !== room.roomId) return;
 
-	await client?.decryptEventIfNeeded(event);
+	const activeClient = client; // Make a constant so if the client changes during the await it doesn't break
+	if (!activeClient) return;
+
+	await activeClient.decryptEventIfNeeded(event);
+
+	if (!isStillActive(room.roomId, activeClient)) return;
+
+	const timelineEvent = toTimelineEvent(event, room);
+	if (!timelineEvent) return;
+
+	if (oldEventId && oldEventId !== timelineEvent.id) {
+		matrixState.events = matrixState.events.filter((event) => event.id !== oldEventId);
+	}
+
+	const index = matrixState.events.findIndex((event) => event.id === timelineEvent.id);
+
+	if (index === -1) {
+		matrixState.events.push(timelineEvent);
+	} else {
+		matrixState.events[index] = timelineEvent;
+	}
+
+	mergeRoomMessages(room);
+};
+
+const onMessageDecrypted = (event: MatrixEvent, err?: Error) => {
+	if (err || !client) return;
+
+	const roomId = event.getRoomId();
+	if (!roomId || matrixState.currentRoom?.roomId !== roomId) return;
+
+	const room = client.getRoom(roomId);
+	if (!room) return;
 
 	const timelineEvent = toTimelineEvent(event, room);
 	if (!timelineEvent) return;
 
 	const eventIndex = matrixState.events.findIndex(
-		(stateEvent) => stateEvent.id === (oldEventId ?? timelineEvent.id)
+		(stateEvent) => stateEvent.id === timelineEvent.id
 	);
-	if (eventIndex === -1) return;
 
-	matrixState.events[eventIndex] = timelineEvent;
+	if (eventIndex === -1) {
+		mergeRoomMessages(room);
+	} else {
+		matrixState.events[eventIndex] = timelineEvent;
+	}
 };
 
 export const setupMessageListener = (client: MatrixClient) => {
 	client.on(RoomEvent.Timeline, onTimelineEvent);
 	client.on(RoomEvent.LocalEchoUpdated, onLocalEchoUpdated);
+
+	// why does matrix have a MatrixEventEvent WHY IS THIS SO WEIRD
+	// i guess i was spoiled with the bluesky api which is so good
+	client.on(MatrixEventEvent.Decrypted, onMessageDecrypted);
 };
 
 export const cleanupMessageListener = (client: MatrixClient) => {
 	client.off(RoomEvent.Timeline, onTimelineEvent);
 	client.off(RoomEvent.LocalEchoUpdated, onLocalEchoUpdated);
+	client.off(MatrixEventEvent.Decrypted, onMessageDecrypted);
 };
 
+/** Merges the timeline events that happened during the initial load */
+const mergeRoomMessages = (room: Room) => {
+	if (matrixState.currentRoom?.roomId !== room.roomId) return;
+
+	const sdkEvents = room.getLiveTimeline().getEvents();
+
+	const byId = new Map(matrixState.events.map((event) => [event.id, event]));
+
+	for (const event of sdkEvents) {
+		const converted = toTimelineEvent(event, room);
+		if (converted) byId.set(converted.id, converted);
+	}
+
+	const order = new Map(sdkEvents.map((event, index) => [event.getId(), index]));
+
+	matrixState.events = [...byId.values()].sort(
+		(a, b) => (order.get(a.id) ?? Infinity) - (order.get(b.id) ?? Infinity)
+	);
+};
+
+let roomLoadVersion = 0;
 export const setupMessages = async (roomId: string) => {
-	if (!client) return;
-	const newRoom = client.getRoom(roomId);
+	// When switching rooms and loading new stuff, clear.
+	matrixState.events = [];
+
+	const version = ++roomLoadVersion;
+	const activeClient = client;
+	if (!activeClient) return;
+
+	const newRoom = activeClient.getRoom(roomId);
 	if (!newRoom) {
 		matrixState.currentRoom = undefined;
 		return;
@@ -122,18 +194,19 @@ export const setupMessages = async (roomId: string) => {
 		roomId: newRoom.roomId
 	};
 
-	// Get initial messages in room
-	const events = await Promise.all(
+	// Decrypt initial messages
+	await Promise.all(
 		newRoom
 			.getLiveTimeline()
 			.getEvents()
-			.map(async (event) => {
-				await client?.decryptEventIfNeeded(event);
-				return toTimelineEvent(event, newRoom);
-			})
+			.map((event) => activeClient.decryptEventIfNeeded(event))
 	);
 
-	matrixState.events = events.filter((event): event is TimelineEvent => event !== null);
+	// Do some checks to make sure it's still valid to set the events
+	if (version !== roomLoadVersion) return;
+	if (!isStillActive(roomId, activeClient)) return;
+
+	mergeRoomMessages(newRoom);
 };
 
 export const sendTextMessage = (content: string, roomId: string) => {

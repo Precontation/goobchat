@@ -2,8 +2,6 @@
 	import MessageDisplay from '$lib/components/chat/message/Message.svelte';
 	import type { TimelineMessage } from '$lib/types/event';
 
-	import { fly } from 'svelte/transition';
-
 	let { messages }: { messages: TimelineMessage[] } = $props();
 
 	let listRef = $state<HTMLDivElement>();
@@ -22,9 +20,7 @@
 
 <div class="message-list" bind:this={listRef}>
 	{#each messages as message, i}
-		<div transition:fly={{ y: 40, duration: 300 }}>
-			<MessageDisplay {message} prevMessage={i > 0 ? messages[i - 1] : null} reversed={true} />
-		</div>
+		<MessageDisplay {message} prevMessage={i > 0 ? messages[i - 1] : null} reversed={true} />
 	{/each}
 </div>
 
