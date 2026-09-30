@@ -2,8 +2,7 @@ import { matrixState } from '$lib/state/matrixClient.svelte';
 import type { TimelineEvent, TimelineMessage } from '$lib/types/event';
 import { EventType, MatrixClient, MatrixEvent, MsgType, Room, RoomEvent } from 'matrix-js-sdk';
 import { client } from './client';
-
-let room: Room | null;
+import { getRoomCaption } from './rooms';
 
 const handleRoomMessage = (
 	event: MatrixEvent,
@@ -59,15 +58,14 @@ const toTimelineEvent = (event: MatrixEvent, eventRoom: Room): TimelineEvent | n
 	return timelineEvent;
 };
 
-const onTimelineEvent = async (event: MatrixEvent, eventRoom: Room | undefined) => {
-	const savedRoom = eventRoom ?? room;
-	if (!savedRoom) return;
+const onTimelineEvent = async (event: MatrixEvent, room: Room | undefined) => {
+	if (!room) return;
 
-	if (savedRoom.roomId !== event.getRoomId()) return;
+	if (matrixState.currentRoom?.roomId !== event.getRoomId()) return;
 
 	await client?.decryptEventIfNeeded(event);
 
-	const timelineEvent = toTimelineEvent(event, savedRoom);
+	const timelineEvent = toTimelineEvent(event, room);
 
 	if (!timelineEvent) return;
 
@@ -81,19 +79,14 @@ const onTimelineEvent = async (event: MatrixEvent, eventRoom: Room | undefined) 
 	}
 };
 
-const onLocalEchoUpdated = async (
-	event: MatrixEvent,
-	eventRoom: Room | null,
-	oldEventId?: string
-) => {
-	const savedRoom = eventRoom ?? room;
-	if (!savedRoom) return;
+const onLocalEchoUpdated = async (event: MatrixEvent, room: Room | null, oldEventId?: string) => {
+	if (!room) return;
 
-	if (savedRoom.roomId !== event.getRoomId()) return;
+	if (room.roomId !== event.getRoomId()) return;
 
 	await client?.decryptEventIfNeeded(event);
 
-	const timelineEvent = toTimelineEvent(event, savedRoom);
+	const timelineEvent = toTimelineEvent(event, room);
 	if (!timelineEvent) return;
 
 	const eventIndex = matrixState.events.findIndex(
@@ -116,28 +109,38 @@ export const cleanupMessageListener = (client: MatrixClient) => {
 
 export const setupMessages = async (roomId: string) => {
 	if (!client) return;
-	room = client.getRoom(roomId);
-	if (!room) return;
+	const newRoom = client.getRoom(roomId);
+	if (!newRoom) {
+		matrixState.currentRoom = undefined;
+		return;
+	}
+
+	matrixState.currentRoom = {
+		avatarSrc: newRoom.getMxcAvatarUrl(),
+		caption: getRoomCaption(newRoom),
+		name: newRoom.name,
+		roomId: newRoom.roomId
+	};
 
 	// Get initial messages in room
 	const events = await Promise.all(
-		room
+		newRoom
 			.getLiveTimeline()
 			.getEvents()
 			.map(async (event) => {
 				await client?.decryptEventIfNeeded(event);
-				return toTimelineEvent(event, room!);
+				return toTimelineEvent(event, newRoom);
 			})
 	);
 
 	matrixState.events = events.filter((event): event is TimelineEvent => event !== null);
 };
 
-export const sendTextMessage = (content: string) => {
-	if (!client || !room) return;
+export const sendTextMessage = (content: string, roomId: string) => {
+	if (!client) return;
 
 	client.sendMessage(
-		room.roomId,
+		roomId,
 		null, // TODO: add thread support
 		{
 			msgtype: MsgType.Text,

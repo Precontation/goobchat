@@ -6,9 +6,9 @@
 	let textAreaRef = $state<HTMLTextAreaElement>();
 
 	const onSubmit = () => {
-		if (!textAreaRef) return;
+		if (!textAreaRef || !matrixState.currentRoom) return;
 
-		sendTextMessage(textAreaRef.value);
+		sendTextMessage(textAreaRef.value, matrixState.currentRoom.roomId);
 	};
 
 	const handleKeydown = (event: KeyboardEvent) => {
