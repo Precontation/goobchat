@@ -38,6 +38,14 @@
 		overscroll-behavior: none;
 	}
 
+	button:hover {
+		background-color: var(--color-surface-hover);
+	}
+
+	button:active {
+		background-color: var(--color-surface-active);
+	}
+
 	textarea:focus {
 		outline: none;
 		box-shadow: none;

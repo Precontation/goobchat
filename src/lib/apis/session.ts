@@ -1,7 +1,7 @@
 // this will be for the stuff that reads and writes store in IndexedDB using the database.ts like the tokens, users ids, etc.
-
 import { createTransaction } from './database';
 const SESSION_KEY = 'current';
+
 export interface Session {
 	accessToken: string;
 	userId: string;

@@ -27,12 +27,4 @@
 
 		padding: var(--padding-theme);
 	}
-
-	button:hover {
-		background-color: var(--color-surface-hover);
-	}
-
-	button:active {
-		background-color: var(--color-surface-active);
-	}
 </style>

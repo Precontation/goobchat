@@ -2,7 +2,10 @@
 	import { load } from '$lib/apis/matrix/client';
 	import favicon from '$lib/assets/favicon.svg';
 	import LoginForm from '$lib/components/login/LoginForm.svelte';
+	import SettingsPanel from '$lib/components/settings/SettingsPanel.svelte';
+	import Verification from '$lib/components/settings/verification/Verification.svelte';
 	import { matrixState } from '$lib/state/matrixClient.svelte';
+	import { Menu, menusOpened } from '$lib/state/menus.svelte';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import './layout.css';
@@ -17,6 +20,16 @@
 <svelte:head>
 	<link rel="icon" href={favicon} />
 </svelte:head>
+
+{#each menusOpened as menu, i (i)}
+	<div class="fixed top-24 right-24 bottom-24 left-24 z-{i}">
+		{#if menu == Menu.SETTINGS}
+			<SettingsPanel />
+		{:else if menu === Menu.VERIFICATION}
+			<Verification />
+		{/if}
+	</div>
+{/each}
 
 {#if !matrixState.loadingSession}
 	{#if !matrixState.loading}
