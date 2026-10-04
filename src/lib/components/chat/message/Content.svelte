@@ -2,6 +2,8 @@
 	import type { TimelineMessage } from '$lib/types/event';
 	import { EventStatus } from 'matrix-js-sdk';
 	import Content from './Content.svelte';
+	import MessageFile from './MessageFile.svelte';
+	import MessageImage from './MessageImage.svelte';
 
 	let { message, showReply = true }: { message: TimelineMessage; showReply?: boolean } = $props();
 </script>
@@ -21,5 +23,9 @@
 		<p class="whitespace-pre-wrap">
 			{message.data.content}
 		</p>
+	{:else if message.data.kind === 'image'}
+		<MessageImage file={message.data} />
+	{:else if message.data.kind === 'file'}
+		<MessageFile file={message.data} />
 	{/if}
 </div>

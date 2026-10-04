@@ -1,5 +1,5 @@
 import { matrixState } from '$lib/state/matrixClient.svelte';
-import type { TimelineEvent, TimelineMessage } from '$lib/types/event';
+import type { MessageData, TimelineEvent, TimelineMessage } from '$lib/types/event';
 import {
 	EventType,
 	MatrixClient,
@@ -9,6 +9,7 @@ import {
 	Room,
 	RoomEvent
 } from 'matrix-js-sdk';
+import type { RoomMessageEventContent } from 'matrix-js-sdk/lib/types';
 import { client } from './client';
 import { getRoomCaption } from './rooms';
 
@@ -26,6 +27,73 @@ const handleRoomMessage = (
 	if (!sender) return null; // Messages have to have a sender!
 	const member = eventRoom.getMember(sender);
 
+	const content = event.getContent<RoomMessageEventContent>();
+
+	let data: MessageData;
+	switch (content.msgtype) {
+		case MsgType.Text:
+			data = {
+				kind: 'text',
+				content: content.body
+			};
+			break;
+		case MsgType.Image:
+			if (!content.url) return null;
+
+			data = {
+				kind: 'image',
+				caption: content.filename ? content.body : undefined, // Only show caption when filename exists
+				filename: content.filename ?? content.body,
+				src: content.url,
+				height: content.info?.h,
+				width: content.info?.w,
+				mimeType: content.info?.mimetype,
+				size: content.info?.size
+			};
+			break;
+		case MsgType.File:
+			if (!content.url) return null;
+
+			data = {
+				kind: 'file',
+				caption: content.filename ? content.body : undefined, // Only show caption when filename exists
+				filename: content.filename ?? content.body,
+				src: content.url,
+				mimeType: content.info?.mimetype,
+				size: content.info?.size
+			};
+			break;
+		case MsgType.Audio:
+			// TODO: audio not just file
+			if (!content.url) return null;
+
+			data = {
+				kind: 'file',
+				caption: content.filename ? content.body : undefined, // Only show caption when filename exists
+				filename: content.filename ?? content.body,
+				src: content.url,
+				mimeType: content.info?.mimetype,
+				size: content.info?.size
+			};
+			break;
+		case MsgType.Video:
+			// TODO: video not just file
+			if (!content.url) return null;
+
+			data = {
+				kind: 'file',
+				caption: content.filename ? content.body : undefined, // Only show caption when filename exists
+				filename: content.filename ?? content.body,
+				src: content.url,
+				mimeType: content.info?.mimetype,
+				size: content.info?.size
+			};
+			break;
+		// TODO: there are more but mehhh
+		default:
+			return null;
+	}
+
 	const message: TimelineMessage = {
 		...timelineEvent,
 
@@ -36,10 +104,7 @@ const handleRoomMessage = (
 			avatarSrc: member?.getMxcAvatarUrl()
 		},
 
-		data: {
-			kind: 'text',
-			content: event.getContent().body
-		},
+		data: data,
 
 		status: event.status
 	};
@@ -218,6 +283,34 @@ export const sendTextMessage = (content: string, roomId: string) => {
 		{
 			msgtype: MsgType.Text,
 			body: content
+		}
+	);
+};
+
+export const sendFileMessage = (uri: string, body: string, roomId: string) => {
+	if (!client) return;
+
+	client.sendMessage(
+		roomId,
+		null, // TODO: add thread support
+		{
+			msgtype: MsgType.File,
+			body: body,
+			url: uri
+		}
+	);
+};
+
+export const sendImageMessage = (uri: string, body: string, roomId: string) => {
+	if (!client) return;
+
+	client.sendMessage(
+		roomId,
+		null, // TODO: add thread support
+		{
+			msgtype: MsgType.Image,
+			body: body,
+			url: uri
 		}
 	);
 };

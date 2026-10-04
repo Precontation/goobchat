@@ -8,7 +8,7 @@
 
 <div class="flex w-full flex-col gap-theme">
 	{#each rooms as room, i (room.roomId)}
-		<div animate:flip>
+		<div animate:flip class="h-15">
 			<RoomButton {room} isLast={i === rooms.length - 1} />
 		</div>
 	{/each}

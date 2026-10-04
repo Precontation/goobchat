@@ -3,7 +3,7 @@ import type { User } from './user';
 
 export type MessageKind = 'text' | 'image' | 'file';
 
-export interface TextMessage {
+interface TextMessage {
 	kind: 'text';
 
 	/** @todo make content an array for custom formatting */
@@ -11,11 +11,12 @@ export interface TextMessage {
 }
 
 /** Holds basic info for images, files, audio, etc. */
-interface AttachmentData {
+export interface AttachmentData {
 	src: string;
 	filename: string;
 	mimeType?: string;
 	caption?: string;
+	size?: number;
 }
 
 export interface FileMessage extends AttachmentData {
@@ -24,9 +25,11 @@ export interface FileMessage extends AttachmentData {
 
 export interface ImageMessage extends AttachmentData {
 	kind: 'image';
-	width: number;
-	height: number;
+	width?: number;
+	height?: number;
 }
+
+export type MessageData = TextMessage | FileMessage | ImageMessage;
 
 /** A message of any message type. */
 export interface TimelineMessage extends TimelineEvent {
@@ -38,7 +41,7 @@ export interface TimelineMessage extends TimelineEvent {
 	sender: User;
 
 	/** Content and metadata specific to the message kind. */
-	data: TextMessage | FileMessage | ImageMessage;
+	data: MessageData;
 
 	/** The status of the current message */
 	status: EventStatus | null;
