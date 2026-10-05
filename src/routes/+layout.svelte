@@ -21,15 +21,19 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-{#each menusOpened as menu, i (i)}
-	<div class="fixed top-24 right-24 bottom-24 left-24 z-{i}">
-		{#if menu == Menu.SETTINGS}
-			<SettingsPanel />
-		{:else if menu === Menu.VERIFICATION}
-			<Verification />
-		{/if}
+{#if menusOpened.length > 0}
+	<div class="fixed h-full w-full bg-background/80">
+		{#each menusOpened as menu, i (i)}
+			<div class="fixed top-24 right-24 bottom-24 left-24 z-{i}">
+				{#if menu == Menu.SETTINGS}
+					<SettingsPanel />
+				{:else if menu === Menu.VERIFICATION}
+					<Verification />
+				{/if}
+			</div>
+		{/each}
 	</div>
-{/each}
+{/if}
 
 {#if !matrixState.loadingSession}
 	{#if !matrixState.loading}

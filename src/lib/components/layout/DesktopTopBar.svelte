@@ -1,7 +1,7 @@
 <script>
 	import { logout } from '$lib/apis/matrix/client';
 	import { currentUser } from '$lib/state/currentUser.svelte';
-	import { Menu, menusOpened } from '$lib/state/menus.svelte';
+	import { Menu, openMenu } from '$lib/state/menus.svelte';
 	import ContextMenu from '../ui/ContextMenu.svelte';
 	import UserSummary from '../ui/UserSummary.svelte';
 	import Bar from './Bar.svelte';
@@ -16,7 +16,7 @@
 			{
 				name: 'Settings',
 				action: () => {
-					menusOpened.push(Menu.SETTINGS);
+					openMenu(Menu.SETTINGS);
 				}
 			},
 			{

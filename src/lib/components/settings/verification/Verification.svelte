@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { requestVerificationOtherDevice } from '$lib/apis/matrix/client';
+	import CloseIcon from '$lib/components/ui/CloseIcon.svelte';
 	import LoadingCircle from '$lib/components/ui/LoadingCircle.svelte';
+	import { menusOpened } from '$lib/state/menus.svelte';
 	import {
 		VerificationPhase,
 		VerificationRequestEvent,
@@ -65,6 +67,10 @@
 	{:else}
 		<h1>Verification failed.</h1>
 	{/if}
+
+	<button onclick={() => menusOpened.pop()} class="absolute top-5 right-4 h-10 w-10"
+		><CloseIcon /></button
+	>
 </div>
 
 <style>

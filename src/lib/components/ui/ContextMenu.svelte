@@ -3,13 +3,20 @@
 	import Popover from './Popover.svelte';
 
 	let { elements }: { elements: ContextMenuItem[] } = $props();
+
+	const id = 'user-summary';
 </script>
 
-<Popover popoverId="user-summary">
+<Popover popoverId={id}>
 	{#each elements as element, i (i)}
 		<button
 			class={elements.length - 1 != i ? 'border-b border-border' : ''}
-			onclick={element.action}
+			onclick={() => {
+				const popover = document.getElementById(id);
+				if (popover) popover.hidePopover();
+
+				element.action();
+			}}
 		>
 			{#if element.icon}
 				<element.icon />

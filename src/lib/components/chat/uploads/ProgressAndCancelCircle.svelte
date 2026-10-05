@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CloseIcon from '$lib/components/ui/CloseIcon.svelte';
 	import { cubicOut } from 'svelte/easing';
 	import { Tween } from 'svelte/motion';
 	import { fade } from 'svelte/transition';
@@ -55,6 +56,6 @@
 			: 'opacity-0 hover:opacity-100 active:opacity-100'}"
 		onclick={onXButton}
 	>
-		<span class="text-primary">X</span>
+		<span class="text-primary"><CloseIcon /></span>
 	</button>
 </div>
