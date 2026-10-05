@@ -46,7 +46,8 @@
 		"vitest-browser-svelte": "^2.1.1"
 	},
 	"dependencies": {
-		"@tauri-apps/api": "^2.11.1",
+		"@tauri-apps/api": "^2.12.1",
+		"@tauri-apps/plugin-notification": "~2.5.1",
 		"@tauri-apps/plugin-os": "~2.3.2",
 		"matrix-js-sdk": "^42.3.0"
 	}

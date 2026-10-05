@@ -1,3 +1,4 @@
+import { sendNotif } from '$lib/services/notifications';
 import { matrixState } from '$lib/state/matrixClient.svelte';
 import type { MessageData, TimelineEvent, TimelineMessage } from '$lib/types/event';
 import {
@@ -144,6 +145,7 @@ const onTimelineEvent = async (event: MatrixEvent, room: Room | undefined) => {
 	await activeClient.decryptEventIfNeeded(event);
 
 	if (!isStillActive(room.roomId, activeClient)) return;
+	sendNotif('event!', 'a timeline event occurred.');
 
 	mergeRoomMessages(room);
 };

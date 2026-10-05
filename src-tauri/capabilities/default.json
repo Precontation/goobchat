@@ -10,8 +10,10 @@
     "core:window:default",
     "core:window:allow-close",
     "core:window:allow-minimize",
+    "core:app:allow-app-hide",
     "core:window:allow-toggle-maximize",
     "core:window:allow-start-dragging",
-    "os:default"
+    "os:default",
+    "notification:default"
   ]
 }
